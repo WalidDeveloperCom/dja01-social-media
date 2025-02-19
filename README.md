@@ -10,7 +10,8 @@ This is a simple social media application built with Django, featuring user auth
 - Create, read, update, and delete posts
 - User profiles
 - Image upload for posts
-- Responsive design using Bootstrap
+- like, comment, Share
+- Responsive design using TailwindCSS
 
 ## Setup Instructions
 
