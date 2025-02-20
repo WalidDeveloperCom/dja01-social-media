@@ -108,6 +108,95 @@
 </div>
 
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const isAuthenticated = {{ user.is_authenticated|yesno:"true,false" }};
+    
+        function checkLogin(event) {
+            if (!isAuthenticated) {
+                event.preventDefault();
+                alert("You must be logged in to perform this action.");
+                window.location.href = "{% url 'login' %}";
+                return false;
+            }
+            return true;
+        }
+    
+        // Like functionality
+        document.querySelectorAll('.like-button').forEach(button => {
+            button.addEventListener('click', function(event) {
+                if (!checkLogin(event)) return;
+    
+                const postId = this.dataset.postId;
+                fetch('/like-post/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: `post_id=${postId}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    this.querySelector('.likes-count').textContent = data.likes_count;
+                    const svg = this.querySelector('svg');
+                    svg.setAttribute('fill', data.liked ? 'currentColor' : 'none');
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        });
+    
+        // Comment functionality
+        document.querySelectorAll('.comment-form').forEach(form => {
+            form.addEventListener('submit', function(event) {
+                if (!checkLogin(event)) return;
+    
+                event.preventDefault();
+                const postId = this.dataset.postId;
+                const formData = new FormData(this);
+    
+                fetch('/add-comment/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: new URLSearchParams(formData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        });
+    
+        // Share functionality
+        document.querySelectorAll('a[href*="share_post"]').forEach(button => {
+            button.addEventListener('click', function(event) {
+                if (!checkLogin(event)) return;
+            });
+        });
+    
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.startsWith(name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    });
+    </script>
+    
+
+{% comment %} <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Like functionality
     document.querySelectorAll('.like-button').forEach(button => {
@@ -192,6 +281,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return cookieValue;
     }
 });
-</script>
+</script> {% endcomment %}
 {% endblock %}
 
