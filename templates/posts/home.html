@@ -108,100 +108,28 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const isAuthenticated = {{ user.is_authenticated|yesno:"true,false" }};
-    
-        function checkLogin(event) {
-            if (!isAuthenticated) {
-                event.preventDefault();
-                alert("You must be logged in to perform this action.");
-                window.location.href = "{% url 'login' %}";
-                return false;
-            }
-            return true;
-        }
-    
-        // Like functionality
-        document.querySelectorAll('.like-button').forEach(button => {
-            button.addEventListener('click', function(event) {
-                if (!checkLogin(event)) return;
-    
-                const postId = this.dataset.postId;
-                fetch('/like-post/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'X-CSRFToken': getCookie('csrftoken')
-                    },
-                    body: `post_id=${postId}`
-                })
-                .then(response => response.json())
-                .then(data => {
-                    this.querySelector('.likes-count').textContent = data.likes_count;
-                    const svg = this.querySelector('svg');
-                    svg.setAttribute('fill', data.liked ? 'currentColor' : 'none');
-                })
-                .catch(error => console.error('Error:', error));
-            });
-        });
-    
-        // Comment functionality
-        document.querySelectorAll('.comment-form').forEach(form => {
-            form.addEventListener('submit', function(event) {
-                if (!checkLogin(event)) return;
-    
-                event.preventDefault();
-                const postId = this.dataset.postId;
-                const formData = new FormData(this);
-    
-                fetch('/add-comment/', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': getCookie('csrftoken')
-                    },
-                    body: new URLSearchParams(formData)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        location.reload();
-                    }
-                })
-                .catch(error => console.error('Error:', error));
-            });
-        });
-    
-        // Share functionality
-        document.querySelectorAll('a[href*="share_post"]').forEach(button => {
-            button.addEventListener('click', function(event) {
-                if (!checkLogin(event)) return;
-            });
-        });
-    
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.startsWith(name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-    });
-    </script>
-    
-
-{% comment %} <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Convert Django boolean to JavaScript boolean
+    const isAuthenticated = "{{ user.is_authenticated|yesno:'true,false' }}" === "true";
+
+    function checkLogin(event) {
+        if (!isAuthenticated) {
+            event.preventDefault();
+            alert("You must be logged in to perform this action.");
+            window.location.href = "{% url 'login' %}";
+            return false;
+        }
+        return true;
+    }
+
     // Like functionality
-    document.querySelectorAll('.like-button').forEach(button => {
-        button.addEventListener('click', function() {
-            const postId = this.dataset.postId;
+    document.addEventListener('click', function(event) {
+        if (event.target.closest('.like-button')) {
+            if (!checkLogin(event)) return;
+
+            const button = event.target.closest('.like-button');
+            const postId = button.dataset.postId;
+
             fetch('/like-post/', {
                 method: 'POST',
                 headers: {
@@ -212,19 +140,14 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => response.json())
             .then(data => {
-                this.querySelector('.likes-count').textContent = data.likes_count;
-                const svg = this.querySelector('svg');
-                if (data.liked) {
-                    svg.setAttribute('fill', 'currentColor');
-                } else {
-                    svg.setAttribute('fill', 'none');
-                }
+                button.querySelector('.likes-count').textContent = data.likes_count;
+                button.querySelector('svg').classList.toggle('text-red-500', data.liked); // Toggle color
             })
             .catch(error => console.error('Error:', error));
-        });
+        }
     });
 
-    // Comment functionality
+  // Comment functionality
     document.querySelectorAll('.comment-form').forEach(form => {
         form.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -265,14 +188,21 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Helper function to get CSRF token
+    // Share functionality
+    document.addEventListener('click', function(event) {
+        if (event.target.closest('a[href*="share_post"]')) {
+            checkLogin(event);
+        }
+    });
+
+    // CSRF token function
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
             const cookies = document.cookie.split(';');
             for (let i = 0; i < cookies.length; i++) {
                 const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                if (cookie.startsWith(name + '=')) {
                     cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
                     break;
                 }
@@ -281,6 +211,8 @@ document.addEventListener('DOMContentLoaded', function() {
         return cookieValue;
     }
 });
-</script> {% endcomment %}
+</script>
+
+
 {% endblock %}
 
