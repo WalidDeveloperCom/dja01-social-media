@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('', views.home, name='home'),
@@ -11,9 +12,7 @@ urlpatterns = [
     path('share-post/<int:post_id>/', views.share_post, name='share_post'),
 
 
-
-
-    path('signup/', views.SignUpView.as_view(), name='signup'),
+    #path('signup/', views.SignUpView.as_view(), name='signup'),
     path('profile/', views.profile, name='profile'),
     path('profile/edit/', views.edit_profile, name='edit_profile'),
     path('password_change/', auth_views.PasswordChangeView.as_view(), name='password_change'),
