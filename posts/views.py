@@ -1,5 +1,4 @@
 # views.py
-
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
@@ -7,6 +6,8 @@ from django.views.decorators.http import require_POST
 from django.contrib import messages
 from .models import Post, Comment
 from .forms import PostForm, CommentForm
+from .forms import UserProfileForm
+
 
 def home(request):
     posts = Post.objects.select_related('user').prefetch_related('likes', 'comments').all()
@@ -99,3 +100,20 @@ def delete_post(request, post_id):
         return redirect('home')
     return render(request, 'posts/delete_post.html', {'post': post})
 
+@login_required
+def profile(request):
+    user_posts = Post.objects.filter(user=request.user).select_related('user')
+    return render(request, 'users/profile.html', {'posts': user_posts})
+
+@login_required
+def edit_profile(request):
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, request.FILES, instance=request.user.userprofile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Your profile has been updated successfully!')
+            return redirect('profile')
+    else:
+        form = UserProfileForm(instance=request.user.userprofile)
+    
+    return render(request, 'users/edit_profile.html', {'form': form})
