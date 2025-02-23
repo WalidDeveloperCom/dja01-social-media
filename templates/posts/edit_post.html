@@ -1,16 +1,40 @@
 {% extends 'base.html' %}
 
-{% block title %}Edit Post{% endblock %}
+{% block content %}
+<div class="container mx-auto px-4 py-6">
+    <h1 class="text-4xl font-extrabold text-gray-900 mb-8 text-center">Edit Post</h1>
 
-<div class="container mx-auto p-4">
-    {% block content %}
-    <div class="bg-white rounded-lg shadow-md p-8">
-        <h2 style="color: #343a40; font-size: 1.5em; margin-bottom: 1em;">Edit Post</h2>
+    <!-- Edit Post Form -->
+    <div class="bg-white shadow-lg rounded-lg p-6 mb-8">
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
-            {{ form.as_p }}
-            <button class="px-4 py-2 bg-black text-white rounded hover:bg-black-700" type="submit">Update Post</button>
+            
+            <!-- Form Fields -->
+            <div class="space-y-6">
+                {% for field in form %}
+                    <div class="flex flex-col">
+                        <label for="{{ field.id_for_label }}" class="text-lg font-semibold text-gray-700 mb-2">{{ field.label }}</label>
+                        <div class="flex flex-col">
+                            {% if field.name == "content" %}
+                                <!-- Custom styling for content (textarea) field -->
+                                <textarea name="{{ field.name }}" id="{{ field.id_for_label }}" class="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" rows="6">{{ field.value }}</textarea>
+                            {% else %}
+                                <div class="w-full">
+                                    {{ field }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Update Button -->
+            <div class="mt-6">
+                <button type="submit" class="w-full py-3 bg-black text-white font-bold rounded-lg hover:bg-black transition duration-300">
+                    Update Post
+                </button>
+            </div>
         </form>
     </div>
-    {% endblock %}
 </div>
+{% endblock %}

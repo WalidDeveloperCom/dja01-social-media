@@ -2,32 +2,35 @@
 
 {% block content %}
 <div class="max-w-2xl mx-auto">
-    <h2 class="text-2xl font-bold mb-6">Edit Profile</h2>
-    <form method="post" enctype="multipart/form-data" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+    <h2 class="text-3xl font-extrabold text-gray-900 mb-8 text-center">Edit Profile</h2>
+    <form method="post" enctype="multipart/form-data" class="bg-white shadow-xl rounded-lg px-8 pt-6 pb-8 mb-6">
         {% csrf_token %}
         {% for field in form %}
-            <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2" for="{{ field.id_for_label }}">
+            <div class="mb-6">
+                <label class="block text-lg font-semibold text-gray-700 mb-2" for="{{ field.id_for_label }}">
                     {{ field.label }}
                 </label>
-                {{ field }}
+                <div class="w-full">
+                    {{ field }}
+                </div>
                 {% if field.help_text %}
-                    <p class="text-gray-600 text-xs italic">{{ field.help_text }}</p>
+                    <p class="text-gray-600 text-xs italic mt-1">{{ field.help_text }}</p>
                 {% endif %}
                 {% for error in field.errors %}
-                    <p class="text-red-500 text-xs italic">{{ error }}</p>
+                    <p class="text-red-500 text-xs italic mt-1">{{ error }}</p>
                 {% endfor %}
             </div>
         {% endfor %}
-        <div class="flex items-center justify-between">
-            <button class="bg-black bg-primary hover:bg-secondary text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+        <div class="flex items-center justify-between mt-8">
+            <button class="w-full py-3 bg-black text-white font-semibold rounded-lg hover:bg-gray-800 transition duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2" type="submit">
                 Save Changes
             </button>
-            <a class="inline-block align-baseline font-bold text-sm text-primary hover:text-secondary" href="{% url 'profile' %}">
+        </div>
+        <div class="text-center mt-4">
+            <a class="inline-block text-sm text-gray-600 hover:text-gray-800" href="{% url 'profile' %}">
                 Cancel
             </a>
         </div>
     </form>
 </div>
 {% endblock %}
-
