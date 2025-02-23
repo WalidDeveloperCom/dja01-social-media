@@ -187,14 +187,12 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     });
-
     // Share functionality
     document.addEventListener('click', function(event) {
         if (event.target.closest('a[href*="share_post"]')) {
             checkLogin(event);
         }
     });
-
     // CSRF token function
     function getCookie(name) {
         let cookieValue = null;
@@ -212,7 +210,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-
 
 {% endblock %}
 
