@@ -8,10 +8,6 @@ pillow = "==10.1.0"
 pyparsing = "==3.1.1"
 pydot = "==1.4.2"
 django = "*"
-pipfile = "*"
 django-extensions = "*"
 
 [dev-packages]
-
-[requires]
-python_version = "3.9"
